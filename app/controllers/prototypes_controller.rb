@@ -1,6 +1,7 @@
 class PrototypesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  # before_action :contributor_confirmation, only: :edit
+  # binding.pry
+  before_action :contributor_confirmation, only: :edit
 
   def index
     @prototypes = Prototype.includes(:user)
@@ -20,6 +21,7 @@ class PrototypesController < ApplicationController
   end
 
   def show
+    # binding.pry
     @prototype = Prototype.find(params[:id])
     @comment = Comment.new
     @comments = @prototype.comments.includes(:user)
@@ -53,8 +55,12 @@ class PrototypesController < ApplicationController
     params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
   end
 
-  # def contributor_confirmation
-  #   redirect_to root_path unless current_user == @prototype.user
-  # end
+  def contributor_confirmation
+    @prototype = Prototype.find(params[:id])
+    # binding.pry
+    unless current_user.id == @prototype.user.id
+      redirect_to action: :index 
+    end
+  end 
 end
 
